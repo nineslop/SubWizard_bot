@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    container_name: subwizard
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 25061004
+      POSTGRES_DB: sleepqeelz
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - subwizard_network
+
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sleepqeelz
+    environment:
+      DATABASE_URL: postgres://postgres:25061004@db:5432/sleepqeelz
+    depends_on:
+      - db
+    volumes:
+      - ./app_logs:/app/logs
+    ports:
+      - "8000:8000"
+    networks:
+      - subwizard_network
+
+networks:
+  subwizard_network:

@@ -74,10 +74,17 @@ bot.set_my_commands(commands)
 user_states = {}
 
 def add_user(telegram_id):
-    user = User(telegram_id=telegram_id)
-    session.add(user)
-    session.commit()
-    return user.id
+    try:
+        existing_user = session.query(User).filter_by(telegram_id=telegram_id).first()
+        if existing_user:
+            return existing_user.id
+        user = User(telegram_id=telegram_id)
+        session.add(user)
+        session.commit()
+        return user.id
+    except Exception as e:
+        session.rollback()
+        print(f"Error adding user: {e}")
 
 def get_user(telegram_id):
     return session.query(User).filter_by(telegram_id=telegram_id).first()
